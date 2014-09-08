@@ -67,13 +67,13 @@ function wcchainpay_init() {
             
             if($this->test === 'yes')
             {
-                $this->apiAbsoluteUri = 'http://api.test.chainpay.com';
-                $this->paymentUri = 'http://test.chainpay.com/pay/invoice?id=';
+                $this->apiAbsoluteUri = 'https://api.test.chainpay.com';
+                $this->paymentUri = 'https://pay.test.chainpay.com/invoice?id=';
             }
             else
             {
-                $this->apiAbsoluteUri = 'http://api.chainpay.com/';
-                $this->paymentUri = 'https://chainpay.com/pay/invoice?id=';
+                $this->apiAbsoluteUri = 'https://api.chainpay.com/';
+                $this->paymentUri = 'https://pay.chainpay.com/invoice?id=';
             }
             $this->createInvoiceUri = 'invoice';
             
@@ -219,8 +219,11 @@ function wcchainpay_init() {
                 }
                 
                 $this->log->add('ChainPay', 'Could not deserialize response: ' . $data);
-                return false;
             }
+			else if( is_wp_error ($response) )
+			{
+				$this->log->add('ChainPay', 'WP Error on call: ' . json_encode($response));
+			}
             else {
                 if(401 == $response['response']['code'])                
                 {
