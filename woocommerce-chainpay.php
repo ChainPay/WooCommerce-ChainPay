@@ -67,8 +67,8 @@ function wcchainpay_init() {
             
             if($this->test === 'yes')
             {
-                $this->apiAbsoluteUri = 'https://api.test.chainpay.com';
-                $this->paymentUri = 'https://pay.test.chainpay.com/invoice?id=';
+                $this->apiAbsoluteUri = 'https://testapi.chainpay.com';
+                $this->paymentUri = 'https://testpay.chainpay.com/invoice?id=';
             }
             else
             {
