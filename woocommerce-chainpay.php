@@ -5,7 +5,7 @@
  * Description: ChainPay provides Bitcoin Payment Gateway functionality for WooCommerce.
  * Author: AltXE Limited
  * Author URI: https://chainpay.com/
- * Version: 1.1
+ * Version: 1.3
  * License: MIT
  * Text Domain: wcchainpay
  * Domain Path: /languages/
