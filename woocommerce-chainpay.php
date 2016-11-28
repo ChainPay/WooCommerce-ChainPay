@@ -177,7 +177,7 @@ function wcchainpay_init() {
                'RequestAmount' => (float) $order->order_total,
                'ForwardOnPaidUri' => $this->get_return_url( $order ),
                'ForwardOnCancelUri' => htmlspecialchars_decode($order->get_cancel_order_url()),
-               'CallbackUri' => str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'WC_ChainPay', home_url( '/' ) ) )
+               'CallbackUri' => add_query_arg( 'wc-api', 'WC_ChainPay', home_url( '/' ) )
             );
             
             $invoice = $this->ChainPay_Post($params, $this->createInvoiceUri);
