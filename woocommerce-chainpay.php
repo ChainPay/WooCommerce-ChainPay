@@ -5,7 +5,7 @@
  * Description: ChainPay provides Bitcoin Payment Gateway functionality for WooCommerce.
  * Author: AltXE Limited
  * Author URI: https://chainpay.com/
- * Version: 1.6
+ * Version: 1.7
  * License: MIT
  * Text Domain: wcchainpay
  * Domain Path: /languages/
@@ -67,7 +67,7 @@ function wcchainpay_init() {
             
             if($this->test === 'yes')
             {
-                $this->apiAbsoluteUri = 'https://testapi.chainpay.com';
+                $this->apiAbsoluteUri = 'https://testapi.chainpay.com/';
                 $this->paymentUri = 'https://testpay.chainpay.com/invoice?id=';
             }
             else
@@ -177,7 +177,11 @@ function wcchainpay_init() {
                'RequestAmount' => (float) $order->order_total,
                'ForwardOnPaidUri' => $this->get_return_url( $order ),
                'ForwardOnCancelUri' => htmlspecialchars_decode($order->get_cancel_order_url()),
-               'CallbackUri' => add_query_arg( 'wc-api', 'WC_ChainPay', home_url( '/' ) )
+               'CallbackUri' => add_query_arg( 'wc-api', 'WC_ChainPay', home_url( '/' ) ),
+			   'Metadata' => array(
+				 'PayerName' => $order->billing_first_name.' '.$order->billing_last_name,
+				 'PayerEmail' => $order->billing_email
+			   )
             );
             
             $invoice = $this->ChainPay_Post($params, $this->createInvoiceUri);
@@ -192,14 +196,15 @@ function wcchainpay_init() {
         
         private function ChainPay_Post($params, $relativeUri)
         {
-            $postdata = http_build_query( $params, '', '&' );
+            $postdata = json_encode( $params );
             $httpArgs = array(
                 'body'       => $postdata,
                 'sslverify'  => true,
                 'timeout'    => 30,
                 'method'     => 'POST',
                 'headers' => array (
-                    'Authorization' => $this->apiKey
+                    'Authorization' => $this->apiKey,
+                    'Content-Type' => 'application/json'
                 )
             );
             
@@ -339,6 +344,15 @@ function wcchainpay_init() {
                                 $order->cancel_order('Bitcoin payment expired.');
                         
                                 break;
+
+							case 'InvoiceUnderpaid':
+									
+								if($this->debug)
+								{
+									$this->log->add('ChainPay', 'WebHook - OrderId: ' . $orderId . ' is now Underpaid.');
+								}
+					
+								$order->update_status('on-hold', __('Bitcoin payment received, not enough funds sent. Expected: ' . $event->CryptoAmountExpected . ' BTC    Received: ' . $event->CryptoAmountReceived . ' BTC    Outstanding:  ' . $event->CryptoAmountOutstanding . ' BTC. Request they send the outstanding BTC to: ' . $event->CryptoAddress, 'wcchainpay'));
                         }
                         return true;
                     }
